@@ -146,7 +146,7 @@ func messageChannel(conn net.Conn, m chan Message) {
 	err := binary.Read(conn, binary.BigEndian, &header)
 	if err != nil {
 		log.Print(err)
-		continue
+		return
 	}
 	cmd := string(header.Command[:4])
 	fmt.Printf("command = %v, msgLen = %v\n", cmd, header.MsgLen)
@@ -155,26 +155,26 @@ func messageChannel(conn net.Conn, m chan Message) {
 		if header.MsgLen != 36 {
 			log.Print("Expecting 36 bytes HELO, got %d\n",
 				header.MsgLen)
-			continue
+			return
 		}
 		var msg MessageHELO
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
 			log.Print(err)
-			continue
+			return
 		}
 		m <- msg
 	case "STAT":
 		if header.MsgLen != 53 {
 			log.Print("Expecting 53 bytes STAT, got %d\n",
 				header.MsgLen)
-			continue
+			return
 		}
 		var msg MessageSTAT
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
 			log.Print(err)
-			continue
+			return
 		}
 		m <- msg
 	}
