@@ -134,9 +134,10 @@ func messageSender(commands chan SlimCommand) {
 func clientHandler(conn net.Conn, commands chan SlimCommand) {
 	for {
 		select {
-		case command := <- commands:
-			log.Println("command")
-		case message := < message
+		//case command := <- commands:
+		//	log.Println("command")
+		//case message := < message
+		}
 	}
 
 }
