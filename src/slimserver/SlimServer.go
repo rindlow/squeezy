@@ -140,7 +140,7 @@ func clientHandler(conn net.Conn, commands chan SlimCommand) {
 	}
 
 }
-func messageChannel(conn net.Conn, chan m Message) {
+func messageChannel(conn net.Conn, m chan Message) {
 	var header MessageHeader
 
 	err := binary.Read(conn, binary.BigEndian, &header)
