@@ -28,12 +28,12 @@ func main() {
 	<-c
 
 	// Print library statistics
-	fmt.Println("Found", library.NumDirs, "directories.")
 
 	// For now print the library content
-	for key, value := range library.Albums {
-		fmt.Println(key, value)
+	for _, file := range library.Files {
+		fmt.Println(file.Path)
 	}
+
 
 	// Do stuff...
 	time.Sleep(10 * time.Second)
