@@ -3,7 +3,8 @@ package main
 import (
 	"fmt"
 	//"log"
-	"slimserver"
+	//"slimserver"
+	"musiclibrary"
 	"time"
 )
 
@@ -12,12 +13,12 @@ func main() {
 	//slimsrv := new(slimserver.SlimServer)
 
 	// Create the library
-	library := new(slimserver.MusicLibrary)
+	library := new(musiclibrary.MusicLibrary)
 
 	// Initiate a library update
 	c := make(chan int)
 	go func() {
-		slimserver.UpdateLibrary(library, "/data/music")
+		musiclibrary.UpdateLibrary(library, "/data/music")
 		c <- 1
 	}()
 
