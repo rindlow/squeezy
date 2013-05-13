@@ -13,12 +13,12 @@ func main() {
 	//slimsrv := new(slimserver.SlimServer)
 
 	// Create the library
-	library := new(musiclibrary.MusicLibrary)
+	//library := new(musiclibrary.MusicLibrary)
 
 	// Initiate a library update
 	c := make(chan int)
 	go func() {
-		musiclibrary.UpdateLibrary(library, "/data/music")
+		musiclibrary.UpdateLibrary("/data/music")
 		c <- 1
 	}()
 
