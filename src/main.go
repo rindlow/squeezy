@@ -1,7 +1,7 @@
 package main
 
 import (
-	//"fmt"
+	"fmt"
 	//"log"
 	//"slimserver"
 	"musiclibrary"
@@ -16,6 +16,7 @@ func main() {
 	//library := new(musiclibrary.MusicLibrary)
 
 	// Initiate a library update
+        fmt.Println("Updating media library")
 	c := make(chan int)
 	go func() {
 		musiclibrary.UpdateLibrary("/data/music")
@@ -27,6 +28,8 @@ func main() {
 
 	// Wait for the update to complete before continuing
 	<-c
+
+        fmt.Println("Done with update")
 
 	// Print library statistics
         musiclibrary.PrintLibrary()

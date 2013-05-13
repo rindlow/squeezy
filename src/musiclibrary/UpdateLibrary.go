@@ -5,60 +5,24 @@ import (
   "path/filepath"
   "os"
   "fmt"
-  "database/sql"
-  _ "github.com/mattn/go-sqlite3"
+  "musiclibrary/database"
 )
 
 func UpdateLibrary(base string) {
 
-  // Reset the library
-  fmt.Println("Nuking existing library");
-  os.Remove("/tmp/slim.db")
+  // Nuke the existing database
+  database.ReCreate()
 
-  // Setup the database
-  db, err := sql.Open("sqlite3", "/tmp/slim.db")
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-  defer db.Close()
+  // Create a slice for keeping the data in-memory during scan
+  tracks := make([]string, 1)
 
-  // Create table
-  _, err = db.Exec("create table track (id integer not null primary key, fname text)")
-  if err != nil {
-    fmt.Printf("sql error: %s\n", err)
-    return
-  }
-
-  // Begin transaction
-  tx, err := db.Begin()
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-
-  // Prepare query
-  stmt, err := tx.Prepare("insert into track(id, fname) values(?, ?)")
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-  defer stmt.Close()
-
-  // Iterate the base directory
-  fmt.Println("Updating library from", base);
-  var i=0
+  // Iterate all files
   filepath.Walk(base, func(p string, f os.FileInfo, err error) error {
-    _, err = stmt.Exec(i, p)
-    if err != nil {
-      fmt.Println(err)
-      return nil
-    }
-    i++
+    tracks = append(tracks, p)
     return nil
   })
 
-  // commit transaction
-  tx.Commit()
+  // Persist data to disk
+  database.AddTracks(tracks)
 }
 
