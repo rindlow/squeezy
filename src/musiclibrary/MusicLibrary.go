@@ -2,6 +2,7 @@ package musiclibrary
 
 import (
   "musiclibrary/database"
+  "fmt"
 )
 
 //type Mp3File struct {
@@ -14,5 +15,10 @@ type MusicLibrary struct {
 }
 
 func PrintLibrary() {
-  database.GetAllTracks()
+  tracks:=database.GetAllTracks()
+
+  for _, t := range tracks {
+    fmt.Println(t)
+  }
+
 }

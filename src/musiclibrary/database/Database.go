@@ -77,26 +77,30 @@ tx.Commit()
 
 
 
-func GetAllTracks() {
+func GetAllTracks() []string {
 
   conn, err:=getConn()
   if err != nil {
       fmt.Println(err)
-      return
+      return nil
   }
+
+ tracks := make([]string, 1)
 
   rows, err := conn.Query("select id, fname from track")
 	if err != nil {
 		fmt.Println(err)
-		return
+		return nil
 	}
 	for rows.Next() {
 		var id int
 		var fname string
 		rows.Scan(&id, &fname)
-		fmt.Println(id, fname)
+		tracks=append(tracks, fmt.Sprintf("%-6d - %s", id, fname))
 	}
 	rows.Close()
+
+	return tracks
 
 }
 
