@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	//"fmt"
 	//"log"
 	//"slimserver"
 	"musiclibrary"
@@ -29,12 +29,7 @@ func main() {
 	<-c
 
 	// Print library statistics
-
-	// For now print the library content
-	for _, file := range library.Files {
-		fmt.Println(file.Path)
-	}
-
+        musiclibrary.PrintLibrary()
 
 	// Do stuff...
 	time.Sleep(10 * time.Second)
