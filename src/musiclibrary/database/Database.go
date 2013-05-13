@@ -9,18 +9,16 @@ import (
 
 var db *sql.DB = nil
 
-// TBD: Return a tuple (DB, error)
-func getConn() *sql.DB {
+func getConn() (*sql.DB,error) {
   var err error
   if(db == nil) {
     // Setup the database
     db, err = sql.Open("sqlite3", "/tmp/slim.db")
     if err != nil {
-      fmt.Println(err)
-      return nil
+      return nil, err
     }
   }
-  return db
+  return db, nil
 }
 
 
@@ -29,10 +27,14 @@ func ReCreate() {
   fmt.Println("Nuking existing library");
   os.Remove("/tmp/slim.db")
 
-  db=getConn()
+  conn, err:=getConn()
+  if err != nil {
+      fmt.Println(err)
+      return
+  }
 
   // Create table
-  _, err := db.Exec("create table track (id integer not null primary key, fname text)")
+  _, err = conn.Exec("create table track (id integer not null primary key, fname text)")
   if err != nil {
     fmt.Printf("sql error: %s\n", err)
     return
@@ -40,10 +42,14 @@ func ReCreate() {
 }
 
 func AddTracks(tracks []string) {
-  db:=getConn()
+  conn, err:=getConn()
+  if err != nil {
+      fmt.Println(err)
+      return
+  }
 
   // Begin transaction
-  tx, err := db.Begin()
+  tx, err := conn.Begin()
   if err != nil {
     fmt.Println(err)
     return
@@ -73,7 +79,12 @@ tx.Commit()
 
 func GetAllTracks() {
 
-  conn := getConn()
+  conn, err:=getConn()
+  if err != nil {
+      fmt.Println(err)
+      return
+  }
+
   rows, err := conn.Query("select id, fname from track")
 	if err != nil {
 		fmt.Println(err)
