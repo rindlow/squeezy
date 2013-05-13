@@ -7,22 +7,32 @@ import (
   _ "github.com/mattn/go-sqlite3"
 )
 
+var db *sql.DB = nil
+
+// TBD: Return a tuple (DB, error)
+func getConn() *sql.DB {
+  var err error
+  if(db == nil) {
+    // Setup the database
+    db, err = sql.Open("sqlite3", "/tmp/slim.db")
+    if err != nil {
+      fmt.Println(err)
+      return nil
+    }
+  }
+  return db
+}
+
 
 func ReCreate() {
   // Reset the library
   fmt.Println("Nuking existing library");
   os.Remove("/tmp/slim.db")
 
-  // Setup the database
-  db, err := sql.Open("sqlite3", "/tmp/slim.db")
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-  defer db.Close()
+  db=getConn()
 
   // Create table
-  _, err = db.Exec("create table track (id integer not null primary key, fname text)")
+  _, err := db.Exec("create table track (id integer not null primary key, fname text)")
   if err != nil {
     fmt.Printf("sql error: %s\n", err)
     return
@@ -30,13 +40,7 @@ func ReCreate() {
 }
 
 func AddTracks(tracks []string) {
-  // Setup the database
-  db, err := sql.Open("sqlite3", "/tmp/slim.db")
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-  defer db.Close()
+  db:=getConn()
 
   // Begin transaction
   tx, err := db.Begin()
@@ -68,12 +72,8 @@ tx.Commit()
 
 
 func GetAllTracks() {
-  conn, err := sql.Open("sqlite3", "/tmp/slim.db")
-  if err != nil {
-    fmt.Println(err)
-    return
-  }
-  defer conn.Close()
+
+  conn := getConn()
   rows, err := conn.Query("select id, fname from track")
 	if err != nil {
 		fmt.Println(err)
