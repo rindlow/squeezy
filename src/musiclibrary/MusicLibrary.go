@@ -5,11 +5,6 @@ import (
   "fmt"
 )
 
-//type Mp3File struct {
-  //Path string
-  //Size int
-//}
-
 type MusicLibrary struct {
  //Files []Mp3File
 }
@@ -18,7 +13,7 @@ func PrintLibrary() {
   tracks:=database.GetAllTracks()
 
   for _, t := range tracks {
-    fmt.Println(t)
+    fmt.Printf("[%s] %s - %s\n", t.Album, t.Artist, t.Name)
   }
 
 }

@@ -6,6 +6,7 @@ import (
   "os"
   "musiclibrary/database"
   "musiclibrary/id3"
+  "musiclibrary/mp3info"
 )
 
 func UpdateLibrary(base string) {
@@ -14,12 +15,12 @@ func UpdateLibrary(base string) {
   database.ReCreate()
 
   // Create a slice for keeping the data in-memory during scan
-  tracks := make([]string, 1)
+  tracks := make([]mp3info.Mp3Info, 1)
 
   // Iterate all files
   filepath.Walk(base, func(p string, f os.FileInfo, err error) error {
-    foo:=id3.Parse(p)
-    tracks = append(tracks, foo)
+    fileInfo:=id3.Parse(p)
+    tracks = append(tracks, fileInfo)
     return nil
   })
 

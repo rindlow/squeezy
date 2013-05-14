@@ -4,6 +4,7 @@ import (
   "os"
   "fmt"
   "database/sql"
+  "musiclibrary/mp3info"
   _ "github.com/mattn/go-sqlite3"
 )
 
@@ -34,14 +35,14 @@ func ReCreate() {
   }
 
   // Create table
-  _, err = conn.Exec("create table track (id integer not null primary key, fname text)")
+  _, err = conn.Exec("create table track (id integer not null primary key, fname text, name text, album text, artist text)")
   if err != nil {
     fmt.Printf("sql error: %s\n", err)
     return
   }
 }
 
-func AddTracks(tracks []string) {
+func AddTracks(tracks []mp3info.Mp3Info) {
   conn, err:=getConn()
   if err != nil {
       fmt.Println(err)
@@ -56,7 +57,7 @@ func AddTracks(tracks []string) {
   }
 
   // Prepare query
-  stmt, err := tx.Prepare("insert into track(id, fname) values(?, ?)")
+  stmt, err := tx.Prepare("insert into track(id, fname, name, album, artist) values(?, ?, ?, ?, ?)")
   if err != nil {
     fmt.Println(err)
     return
@@ -64,7 +65,7 @@ func AddTracks(tracks []string) {
   defer stmt.Close()
 
   for i, t := range tracks {
-    _, err = stmt.Exec(i, t)
+    _, err = stmt.Exec(i, t.FName, t.Name, t.Album, t.Artist)
     if err != nil {
       fmt.Println(err)
       return 
@@ -77,7 +78,7 @@ tx.Commit()
 
 
 
-func GetAllTracks() []string {
+func GetAllTracks() []mp3info.Mp3Info {
 
   conn, err:=getConn()
   if err != nil {
@@ -85,18 +86,18 @@ func GetAllTracks() []string {
       return nil
   }
 
- tracks := make([]string, 1)
+ tracks := make([]mp3info.Mp3Info, 1)
 
-  rows, err := conn.Query("select id, fname from track")
+  rows, err := conn.Query("select id, fname, name, album, artist from track")
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 	for rows.Next() {
 		var id int
-		var fname string
-		rows.Scan(&id, &fname)
-		tracks=append(tracks, fmt.Sprintf("%-6d - %s", id, fname))
+		var info mp3info.Mp3Info
+		rows.Scan(&id, &info.FName, &info.Name, &info.Album, &info.Artist)
+		tracks=append(tracks, info)
 	}
 	rows.Close()
 
