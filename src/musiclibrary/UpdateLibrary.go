@@ -19,8 +19,10 @@ func UpdateLibrary(base string) {
 
   // Iterate all files
   filepath.Walk(base, func(p string, f os.FileInfo, err error) error {
-    fileInfo:=id3.Parse(p)
-    tracks = append(tracks, fileInfo)
+    if(!f.IsDir()) {
+      fileInfo:=id3.Parse(p)
+      tracks = append(tracks, fileInfo)
+    }
     return nil
   })
 
