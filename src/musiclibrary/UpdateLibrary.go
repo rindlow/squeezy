@@ -20,7 +20,14 @@ func UpdateLibrary(base string) {
   // Iterate all files
   filepath.Walk(base, func(p string, f os.FileInfo, err error) error {
     if(!f.IsDir()) {
+      // Use the id3 parser to get mp3 metadata
       fileInfo:=id3.Parse(p)
+
+      // Add the filesystem metadata
+      fileInfo.ModTime=f.ModTime()
+      fileInfo.Size=f.Size()
+
+      // Add the info to the slice of files
       tracks = append(tracks, fileInfo)
     }
     return nil
