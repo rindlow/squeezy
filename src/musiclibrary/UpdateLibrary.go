@@ -5,6 +5,7 @@ import (
   "path/filepath"
   "os"
   "musiclibrary/database"
+  "musiclibrary/id3"
 )
 
 func UpdateLibrary(base string) {
@@ -17,7 +18,8 @@ func UpdateLibrary(base string) {
 
   // Iterate all files
   filepath.Walk(base, func(p string, f os.FileInfo, err error) error {
-    tracks = append(tracks, p)
+    foo:=id3.Parse(p)
+    tracks = append(tracks, foo)
     return nil
   })
 
