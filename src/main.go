@@ -15,12 +15,14 @@ func main() {
 	var startDisc bool
 	var updateLibrary bool
 	var printLibrary bool
+	var finalSleep bool
 
 	// Parse command line flags
 	flag.BoolVar(&startSlim, "slim", false, "Start the slimserver")
 	flag.BoolVar(&startDisc, "disco", false, "Start the discovery server")
-	flag.BoolVar(&updateLibrary, "update", true, "Initiate a library update")
-	flag.BoolVar(&printLibrary, "print", true, "Print library content on startup")
+	flag.BoolVar(&updateLibrary, "update", false, "Initiate a library update")
+	flag.BoolVar(&printLibrary, "print", false, "Print library content on startup")
+	flag.BoolVar(&finalSleep, "sleep", false, "Sleep 10 secs before exiting")
 	flag.Parse()
 
 	if(startSlim) {
@@ -53,12 +55,14 @@ func main() {
 	}
 
 	// Do stuff...
-	fmt.Println("Sleeping for a while...")
-	for i := 0; i < 10; i++ {
-		fmt.Printf(".");
-		time.Sleep(time.Second)
-	}
+	if(finalSleep) {
+		fmt.Println("Sleeping for a while...")
+		for i := 0; i < 10; i++ {
+			fmt.Printf(".");
+			time.Sleep(time.Second)
+		}
 	fmt.Printf("\n");
+	}
 
 	log.Println("Exiting...");
 }
