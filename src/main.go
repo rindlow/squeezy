@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"slimserver"
 	"musiclibrary"
 	"time"
@@ -23,7 +24,7 @@ func main() {
 	flag.Parse()
 
 	if(startSlim) {
-		fmt.Println("Starting slimserver");
+		log.Println("Starting slimserver");
 		slimcommands := make(chan slimserver.SlimCommand)
 		slimsrv := new(slimserver.SlimServer)
 		go slimsrv.Serve(slimcommands)
@@ -34,7 +35,7 @@ func main() {
 	}
 
 	if(updateLibrary) {
-		fmt.Println("Updating media library")
+		log.Println("Updating media library")
 		c := make(chan int)
 		go func() {
 			musiclibrary.UpdateLibrary("/data/music/Various")
@@ -43,7 +44,7 @@ func main() {
 
 		// Wait for the update to complete before continuing
 		<-c
-		fmt.Println("Done with update")
+		log.Println("Done with update")
 	}
 
 
@@ -59,5 +60,5 @@ func main() {
 	}
 	fmt.Printf("\n");
 
-	fmt.Println("Exiting...");
+	log.Println("Exiting...");
 }
