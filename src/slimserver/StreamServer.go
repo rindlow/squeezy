@@ -3,6 +3,7 @@ package slimserver
 import (
         "net/http"
 	"fmt"
+	"log"
 )
 
 // A handler for generic web requests
@@ -11,7 +12,15 @@ func webHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func streamHandler(w http.ResponseWriter, r *http.Request) {
-    	fmt.Fprintf(w, "This is the stream handler for player %s", r.FormValue("player"))
+
+	playerId:=r.FormValue("player")
+
+	log.Printf("Player %s connected", playerId);
+
+	// TBD: Setup a chan to the SlimServer informing it that
+	//	a player is ready to receive data.
+
+	fmt.Fprintf(w, "Here we should stream you some mp3 data...")
 }
 
 func StreamServer() {
