@@ -16,6 +16,7 @@ func main() {
 	var updateLibrary bool
 	var printLibrary bool
 	var finalSleep bool
+	var libraryBase string
 
 	// Parse command line flags
 	flag.BoolVar(&startSlim, "slim", false, "Start the slimserver")
@@ -23,6 +24,7 @@ func main() {
 	flag.BoolVar(&updateLibrary, "update", false, "Initiate a library update")
 	flag.BoolVar(&printLibrary, "print", false, "Print library content on startup")
 	flag.BoolVar(&finalSleep, "sleep", false, "Sleep 10 secs before exiting")
+	flag.StringVar(&libraryBase, "base", "/data/music", "Basedir for mp3 files")
 	flag.Parse()
 
 	if(startSlim) {
@@ -37,10 +39,10 @@ func main() {
 	}
 
 	if(updateLibrary) {
-		log.Println("Updating media library")
+		log.Println("Updating media library from " + libraryBase) 
 		c := make(chan int)
 		go func() {
-			musiclibrary.UpdateLibrary("/data/music/Various")
+			musiclibrary.UpdateLibrary(libraryBase)
 			c <- 1
 		}()
 
