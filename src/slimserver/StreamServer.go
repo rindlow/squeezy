@@ -26,6 +26,6 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 func StreamServer() {
 	http.HandleFunc("/stream.mp3", streamHandler)
 	http.HandleFunc("/", webHandler)
-	http.ListenAndServe(":9001", nil)
+	http.ListenAndServe(":9000", nil)
 }
  
