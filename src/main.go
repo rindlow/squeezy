@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"slimserver"
 	"musiclibrary"
@@ -66,8 +65,10 @@ func main() {
 
 	// Do stuff...
 	if(finalSleep > 0) {
-		fmt.Printf("Sleeping for %d seconds...", finalSleep)
-		time.Sleep(time.Second * finalSleep)
+		log.Printf("Sleeping for %d seconds...\n", finalSleep)
+		for i := 0; i < finalSleep; i++ {
+			time.Sleep(time.Second)
+		}
 	}
 
 	log.Println("Exiting...");
