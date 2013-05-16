@@ -16,7 +16,7 @@ func main() {
 	var startStream bool
 	var updateLibrary bool
 	var printLibrary bool
-	var finalSleep bool
+	var finalSleep int
 	var libraryBase string
 
 	// Parse command line flags
@@ -25,7 +25,7 @@ func main() {
 	flag.BoolVar(&startStream, "stream", false, "Start the streaming server")
 	flag.BoolVar(&updateLibrary, "update", false, "Initiate a library update")
 	flag.BoolVar(&printLibrary, "print", false, "Print library content on startup")
-	flag.BoolVar(&finalSleep, "sleep", false, "Sleep 10 secs before exiting")
+	flag.IntVar(&finalSleep, "sleep", 60, "Number of seconds to sleep before exit")
 	flag.StringVar(&libraryBase, "base", "/data/music", "Basedir for mp3 files")
 	flag.Parse()
 
@@ -65,9 +65,9 @@ func main() {
 	}
 
 	// Do stuff...
-	if(finalSleep) {
-		fmt.Println("Sleeping for a while...")
-		for i := 0; i < 10; i++ {
+	if(finalSleep > 0) {
+		fmt.Printf("Sleeping for %d seconds...", finalSleep)
+		for i := 0; i < finalSleep; i++ {
 			fmt.Printf(".");
 			time.Sleep(time.Second)
 		}
