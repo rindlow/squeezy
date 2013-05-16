@@ -112,6 +112,7 @@ func (m MessageSTAT) Command() string {
 
 func (*SlimServer) Serve(commands chan SlimCommand) {
 	//var mac net.HardwareAddr
+	log.Println("Starting up listener for tcp 3483")
 	listener, err := net.Listen("tcp", ":3483")
 	if err != nil {
 		log.Panic(err)
@@ -132,6 +133,7 @@ func messageSender(commands chan SlimCommand) {
 }
 
 func clientHandler(conn net.Conn, commands chan SlimCommand) {
+	log.Printf("Got incomming connection from %s", conn.RemoteAddr())
 	for {
 		select {
 		//case command := <- commands:
