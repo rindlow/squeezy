@@ -67,11 +67,7 @@ func main() {
 	// Do stuff...
 	if(finalSleep > 0) {
 		fmt.Printf("Sleeping for %d seconds...", finalSleep)
-		for i := 0; i < finalSleep; i++ {
-			fmt.Printf(".");
-			time.Sleep(time.Second)
-		}
-	fmt.Printf("\n");
+		time.Sleep(time.Second * finalSleep)
 	}
 
 	log.Println("Exiting...");
