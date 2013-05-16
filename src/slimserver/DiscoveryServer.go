@@ -51,7 +51,7 @@ func DiscoveryServer() {
 				mac = payload[12:18]
 				log.Printf("Discovery (d) from %v %v at %v\n",
 					deviceName(payload[2]), mac, raddr)
-				uraddr, err := net.ResolveUDPAddr("IP4",
+				uraddr, err := net.ResolveUDPAddr("udp4",
 					raddr.String())
 				if err != nil {
 					log.Panic(err)
