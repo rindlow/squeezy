@@ -45,7 +45,7 @@ func main() {
 		streamChans.StreamAction = make(chan slimserver.StreamAction)
 
 		// The SlimServer allocates per-player chans, create meta-chan
-		slimChans := make(chan slimserver.SlimRegChan)
+		slimChans := make(chan slimserver.SlimReg)
 
 		// Start Disco
 		log.Info("Starting Discovery server...")

@@ -111,7 +111,7 @@ func (m MessageSTAT) Command() string {
 }
 
 
-func (*SlimServer) Serve(commands chan SlimRegChan) {
+func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 
 	//var mac net.HardwareAddr
 	slimLog.Info("Starting up listener for tcp 3483")
@@ -126,15 +126,22 @@ func (*SlimServer) Serve(commands chan SlimRegChan) {
 			slimLog.Panic("%s", err)
 		}
 
-fmt.Println(conn)
-		// TBD: Create instance specific chans and pass to EventHandler on the SlimRegChan
+		// A new player has connected, start by creating FSM-chans for it
+                reg := new(SlimReg)
+                reg.EventChan = make(chan SlimPlayerEvent)
+                reg.ActionChan = make(chan SlimPlayerAction)
+		reg.Mac="ff:ff:ff:00:00:00" // TBD
+
+		// Send the reg object to the Eventhandler on the meta-chan
+		slimRegChan <- *reg
+
 		// Kick off a clientHandler for conn and the two chans
-		//go clientHandler(conn, commands)
+		go clientHandler(conn, reg.EventChan, reg.ActionChan)
 	}
 }
 
 // TBD: ClientHandler should do both R/W with client
-func clientHandler(conn net.Conn, commands chan SlimCommand) {
+func clientHandler(conn net.Conn, events chan SlimPlayerEvent, actions chan SlimPlayerAction) {
 	slimLog.Info("Got incomming connection from %s", conn.RemoteAddr())
 	for {
 		select {

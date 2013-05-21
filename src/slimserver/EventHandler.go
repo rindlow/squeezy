@@ -30,7 +30,7 @@ type SlimPlayerEvent struct {
 }
 
 // The meta-channel tieing the EventHandler to the SlimServer (e.g. informing EventHandler about new players)
-type SlimRegChan struct {
+type SlimReg struct {
 	// MAC of the new player
 	Mac string	
 
@@ -42,19 +42,36 @@ type SlimRegChan struct {
 }
 
 // The core FSM engine
-func EventHandler(streamChans StreamServerFSMChans, slimChan chan SlimRegChan) {
+func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 
         go func() {
                 for {
 			eventLog.Debug("FSM loop")
 			time.Sleep(time.Second)
 
-			// Check for events from either stream server or one of the player chans,
+			// Check for events (using select) from any of the player chans,
 			// run FSM for these events. Emit actions if necessary.
+			// TBD!!
+
+			// Check for events from the stream server
+			select {
+				case evt := <- streamChans.StreamEvent:
+				eventLog.Info("STREAM-EVT:: %s", evt)
+				// TBD: Pass this event to the appropriate client FSM
+
+  				default:
+  			}
 
 			// Check if there is a new player registered on the meta-chan, if so set it up
+			select {
+				case reg := <- slimReg:
+				eventLog.Info("BINGO: %s", reg)
+				// TBD: Create a FSM for this Mac, associate with the two chans
 
-			// Iterate
+  				default:
+  			}
+
+
 		}
 	}()
 
