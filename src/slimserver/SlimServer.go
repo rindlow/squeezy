@@ -140,10 +140,13 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 	}
 }
 
-// TBD: ClientHandler should do both R/W with client
 func clientHandler(conn net.Conn, events chan SlimPlayerEvent, actions chan SlimPlayerAction) {
 	slimLog.Info("Got incomming connection from %s", conn.RemoteAddr())
 	for {
+
+// TBD: Read from client socket, translate to events which are pushed to FSM
+// TBD: Read from client events chan, translate to messages sent to player socket
+
 		select {
 		//case command := <- commands:
 		//	slimLog.Info("command")
@@ -153,7 +156,7 @@ func clientHandler(conn net.Conn, events chan SlimPlayerEvent, actions chan Slim
 
 }
 
-// TBD: Only per-message parsing should be made here, all state handling is done in EventHandler per-player FSM
+// TBD: Merge with above, only per-message parsing should be performed here, all state handling is done in EventHandler per-player FSM
 func messageChannel(conn net.Conn, m chan Message) {
 	var header MessageHeader
 
