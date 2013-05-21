@@ -5,9 +5,11 @@ import (
 	"encoding/binary"
 	"net"
 	//"fmt"
-	"log"
 	//"time"
+        "github.com/op/go-logging"
 )
+
+var log = logging.MustGetLogger("disco")
 
 type DiscoveryResponseD struct {
 	code byte
@@ -21,11 +23,11 @@ func DiscoveryServer() {
 	var mac net.HardwareAddr
 	addr, err := net.ResolveUDPAddr("udp", ":3483")
 	if err != nil {
-		log.Panic(err)
+		log.Panic("%s", err)
 	}
 	server, err := net.ListenUDP("udp", addr)
 	if err != nil {
-		log.Panic(err)
+		log.Panic("%s", err)
 	}
 
 	go func() {
@@ -33,28 +35,28 @@ func DiscoveryServer() {
 			payload := make([]byte, 256)
 			n, raddr, err := server.ReadFrom(payload)
 			if err != nil {
-				log.Print(err)
+				log.Info("%s", err)
 				continue
 			}
 
-			log.Printf("Received %d bytes from %v\n", n, raddr)
+			log.Info("Received %d bytes from %v\n", n, raddr)
 			if n < 1 {
 				continue
 			}
 			switch payload[0] {
 			case 'd':
 				if n < 18 {
-					log.Printf("%d bytes is too short\n",
+					log.Info("%d bytes is too short\n",
 						n)
 					continue
 				}
 				mac = payload[12:18]
-				log.Printf("Discovery (d) from %v %v at %v\n",
+				log.Info("Discovery (d) from %v %v at %v\n",
 					deviceName(payload[2]), mac, raddr)
 				uraddr, err := net.ResolveUDPAddr("udp4",
 					raddr.String())
 				if err != nil {
-					log.Panic(err)
+					log.Panic("%s", err)
 				}
 
 				response := new(DiscoveryResponseD)
@@ -65,15 +67,15 @@ func DiscoveryServer() {
 				err = binary.Write(buf,
 					binary.LittleEndian, response)
 				if err != nil {
-					log.Print(err)
+					log.Panic("%s", err)
 					continue
 				}
 				l, err := server.WriteToUDP(buf.Bytes(), uraddr)
 				if err != nil {
-					log.Print(err)
+					log.Panic("%s", err)
 					continue
 				}
-				log.Printf("sent %d bytes to %v\n", l, uraddr)
+				log.Info("sent %d bytes to %v\n", l, uraddr)
 			}
 		}
 	}()

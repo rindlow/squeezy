@@ -3,7 +3,6 @@ package slimserver
 import (
 	"time"
 	"fmt"
-	//"log"
 )
 
 // TBD: Fill with data fields

@@ -1,12 +1,14 @@
 package main
 
 import (
-	"log"
 	"slimserver"
 	"musiclibrary"
 	"time"
 	"flag"
+	"github.com/op/go-logging"
 )
+
+var log = logging.MustGetLogger("main")
 
 func main() {
 
@@ -14,6 +16,9 @@ func main() {
 	var updateLibrary bool
 	var finalSleep int
 	var libraryBase string
+
+	// Setup logging levels
+	logging.SetLevel(logging.INFO, "main")
 
 	// Parse command line flags
 	flag.BoolVar(&startSlim, "slim", true, "Start the slimserver")
@@ -23,14 +28,14 @@ func main() {
 	flag.Parse()
 
 	// Init bootstrap
-	log.Println("Starting up...")
+	log.Info("Starting up...")
 
 	// Should we start the server processes
 	if(startSlim) {
 
 		// All the mess with creating channels should be encapsulated somewhere
 
-		log.Println("Setting upp FSM chans...");
+		log.Info("Setting upp FSM chans...");
 
 		// The StreamServer use two static chans, wrap them up
 		streamChans := new(slimserver.StreamServerFSMChans)
@@ -41,26 +46,26 @@ func main() {
 		slimChans := make(chan slimserver.SlimRegChan)
 
 		// Start Disco
-		log.Println("Starting Discovery server...")
+		log.Info("Starting Discovery server...")
 		go slimserver.DiscoveryServer()
 
 		// Start Streamer
-		log.Println("Starting Streaming server...")
+		log.Info("Starting Streaming server...")
 		go slimserver.StreamServer(*streamChans)
 
 		// Start SlimProto
-		log.Println("Starting SlimProto server...")
+		log.Info("Starting SlimProto server...")
 		slimsrv := new(slimserver.SlimServer)
 		go slimsrv.Serve(slimChans)
 
 		// Start EventHandler
-		log.Println("Starting EventHandler...")
+		log.Info("Starting EventHandler...")
 		go slimserver.EventHandler(*streamChans, slimChans)
 	}
 
 	// Should library be updated
 	if(updateLibrary) {
-		log.Println("Updating media library from " + libraryBase) 
+		log.Info("Updating media library from " + libraryBase) 
 		c := make(chan int)
 		go func() {
 			musiclibrary.UpdateLibrary(libraryBase)
@@ -69,18 +74,18 @@ func main() {
 
 		// Wait for the update to complete before continuing
 		<-c
-		log.Println("Done with update")
+		log.Info("Done with update")
 	}
 
 
 	// Final sleep, should be "forever"
 	if(finalSleep > 0) {
-		log.Printf("Sleeping for %d seconds...\n", finalSleep)
+		log.Info("Sleeping for %d seconds...\n", finalSleep)
 		for i := 0; i < finalSleep; i++ {
 			time.Sleep(time.Second)
 		}
 	}
 
 	// Die hard
-	log.Println("Exiting...");
+	log.Info("Exiting...");
 }

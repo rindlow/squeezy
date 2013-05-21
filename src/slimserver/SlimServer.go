@@ -4,11 +4,12 @@ import (
 	//"bytes"
 	"encoding/binary"
 	"fmt"
-	"log"
 	"net"
 	//"time"
+//	"github.com/op/go-logging"
 )
 
+//var log = logging.MustGetLogger("slimproto")
 
 type SlimCommand struct {
 	Command byte
@@ -113,16 +114,16 @@ func (m MessageSTAT) Command() string {
 func (*SlimServer) Serve(commands chan SlimRegChan) {
 
 	//var mac net.HardwareAddr
-	log.Println("Starting up listener for tcp 3483")
+	log.Info("Starting up listener for tcp 3483")
 	listener, err := net.Listen("tcp", ":3483")
 	if err != nil {
-		log.Panic(err)
+		log.Panic("%s", err)
 	}
 
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
-			log.Panic(err)
+			log.Panic("%s", err)
 		}
 
 fmt.Println(conn)
@@ -134,11 +135,11 @@ fmt.Println(conn)
 
 // TBD: ClientHandler should do both R/W with client
 func clientHandler(conn net.Conn, commands chan SlimCommand) {
-	log.Printf("Got incomming connection from %s", conn.RemoteAddr())
+	log.Info("Got incomming connection from %s", conn.RemoteAddr())
 	for {
 		select {
 		//case command := <- commands:
-		//	log.Println("command")
+		//	log.Info("command")
 		//case message := < message
 		}
 	}
@@ -151,7 +152,7 @@ func messageChannel(conn net.Conn, m chan Message) {
 
 	err := binary.Read(conn, binary.BigEndian, &header)
 	if err != nil {
-		log.Print(err)
+		log.Info("%s", err)
 		return
 	}
 	cmd := string(header.Command[:4])
@@ -159,27 +160,27 @@ func messageChannel(conn net.Conn, m chan Message) {
 	switch cmd {
 	case "HELO":
 		if header.MsgLen != 36 {
-			log.Print("Expecting 36 bytes HELO, got %d\n",
+			log.Info("Expecting 36 bytes HELO, got %d\n",
 				header.MsgLen)
 			return
 		}
 		var msg MessageHELO
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
-			log.Print(err)
+			log.Info("%s", err)
 			return
 		}
 		m <- msg
 	case "STAT":
 		if header.MsgLen != 53 {
-			log.Print("Expecting 53 bytes STAT, got %d\n",
+			log.Info("Expecting 53 bytes STAT, got %d\n",
 				header.MsgLen)
 			return
 		}
 		var msg MessageSTAT
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
-			log.Print(err)
+			log.Info("%s", err)
 			return
 		}
 		m <- msg
