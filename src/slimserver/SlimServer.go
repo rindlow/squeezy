@@ -110,28 +110,29 @@ func (m MessageSTAT) Command() string {
 }
 
 
-func (*SlimServer) Serve(commands chan SlimCommand) {
+func (*SlimServer) Serve(commands chan SlimRegChan) {
+
 	//var mac net.HardwareAddr
 	log.Println("Starting up listener for tcp 3483")
 	listener, err := net.Listen("tcp", ":3483")
 	if err != nil {
 		log.Panic(err)
 	}
-	go messageSender(commands)
+
 	for {
 		conn, err := listener.Accept()
 		if err != nil {
 			log.Panic(err)
 		}
 
-		go clientHandler(conn, commands)
+fmt.Println(conn)
+		// TBD: Create instance specific chans and pass to EventHandler on the SlimRegChan
+		// Kick off a clientHandler for conn and the two chans
+		//go clientHandler(conn, commands)
 	}
 }
 
-func messageSender(commands chan SlimCommand) {
-	
-}
-
+// TBD: ClientHandler should do both R/W with client
 func clientHandler(conn net.Conn, commands chan SlimCommand) {
 	log.Printf("Got incomming connection from %s", conn.RemoteAddr())
 	for {
@@ -143,6 +144,8 @@ func clientHandler(conn net.Conn, commands chan SlimCommand) {
 	}
 
 }
+
+// TBD: Only per-message parsing should be made here, all state handling is done in EventHandler per-player FSM
 func messageChannel(conn net.Conn, m chan Message) {
 	var header MessageHeader
 
