@@ -18,6 +18,8 @@ func main() {
 	var libraryBase string
 
 	// Setup logging levels
+	logging.SetLevel(logging.WARNING, "disco")
+	logging.SetLevel(logging.INFO, "event")
 	logging.SetLevel(logging.INFO, "main")
 
 	// Parse command line flags

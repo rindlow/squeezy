@@ -3,10 +3,10 @@ package slimserver
 import (
         "net/http"
 	"fmt"
-//        "github.com/op/go-logging"
+        "github.com/op/go-logging"
 )
 
-//var log = logging.MustGetLogger("slimproto")
+var streamLog = logging.MustGetLogger("streamer")
 
 // Communication channels with the FSM
 
@@ -25,7 +25,7 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 
 	playerId:=r.FormValue("player")
 
-	log.Info("Player %s connected", playerId);
+	streamLog.Info("Player %s connected", playerId);
 
 	// Check if there if a stream is configured for this player, if so start streaming
 

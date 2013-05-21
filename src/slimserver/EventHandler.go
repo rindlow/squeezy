@@ -2,8 +2,10 @@ package slimserver
 
 import (
 	"time"
-	"fmt"
+        "github.com/op/go-logging"
 )
+
+var eventLog = logging.MustGetLogger("event")
 
 // TBD: Fill with data fields
 type StreamAction struct {
@@ -44,7 +46,7 @@ func EventHandler(streamChans StreamServerFSMChans, slimChan chan SlimRegChan) {
 
         go func() {
                 for {
-			fmt.Println("FSM loop")
+			eventLog.Debug("FSM loop")
 			time.Sleep(time.Second)
 
 			// Check for events from either stream server or one of the player chans,
