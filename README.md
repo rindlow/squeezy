@@ -19,3 +19,13 @@ Fetch the source (ignore the warnings for go-id3):
 
   go get github.com/op/go-logging
 
+TODO
+====
+
+The package slimserver is getting overloaded, should probably be refactored into parts:
+* slimproto
+* disco
+* streamer
+* eventhandler
+
+Should be more or less trivial to do.
