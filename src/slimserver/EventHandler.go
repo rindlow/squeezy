@@ -32,9 +32,6 @@ type SlimPlayerEvent struct {
 
 // The meta-channel tieing the EventHandler to the SlimServer (e.g. informing EventHandler about new players)
 type SlimReg struct {
-	// MAC of the new player
-	Mac string	
-
 	// Chan for communicating an event from a player to the FSM
 	EventChan chan SlimPlayerEvent	
 
@@ -44,7 +41,6 @@ type SlimReg struct {
 
 type SlimPlayerFSM struct {
 	State string // for now...
-	Mac   string // for now...
 	EventChan chan SlimPlayerEvent	
 	ActionChan chan SlimPlayerAction	
 }

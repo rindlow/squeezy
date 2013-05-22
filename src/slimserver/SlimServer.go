@@ -1,10 +1,8 @@
 package slimserver
 
 import (
-	//"bytes"
 	"encoding/binary"
 	"net"
-	//"time"
 	"github.com/op/go-logging"
 )
 
@@ -131,7 +129,6 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
                 reg := new(SlimReg)
                 reg.EventChan = make(chan SlimPlayerEvent)
                 reg.ActionChan = make(chan SlimPlayerAction)
-		reg.Mac="ff:ff:ff:00:00:00" // TBD
 
 		// Send the reg object to the Eventhandler on the meta-chan
 		slimRegChan <- *reg
