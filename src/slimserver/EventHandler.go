@@ -21,11 +21,10 @@ type StreamServerFSMChans struct {
 	StreamAction	chan StreamAction
 }
 
-// TBD: Fill with data fields
 type SlimPlayerAction struct {
+	msg Message // The message which is to be passed to the FSM
 }
 
-// TBD: Fill with data fields
 type SlimPlayerEvent struct {
 	msg Message // The message which is to be passed to the FSM
 }
@@ -63,6 +62,18 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 					switch t := evt.msg.(type) {
 					case MessageHELO :
 						eventLog.Info("Got a MessageHELO with DeviceID %d", t.DeviceID)
+
+
+// TBD: This is just bogus testing!
+// Just for the fun of it... Tell the player to start streaming
+var msg MessageStrm
+msg.Command='s'
+msg.Format='m'
+msg.ServerPort=9000
+a := new(SlimPlayerAction)
+a.msg=msg
+p.ActionChan <- *a
+
 					case MessageSTAT :
 						eventLog.Info("Type is MessageSTAT: %s", t)
 					default:

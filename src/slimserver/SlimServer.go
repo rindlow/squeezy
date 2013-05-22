@@ -14,7 +14,7 @@ type SlimCommand struct {
 }
 
 type Message interface {
-	Command() string
+	CommandName() string
 }
 
 type MessageHeader struct {
@@ -100,11 +100,14 @@ type SlimServer struct {
 	Clients map[string]net.TCPConn
 }
 
-func (m MessageHELO) Command() string {
+func (m MessageHELO) CommandName() string {
 	return "HELO"
 }
-func (m MessageSTAT) Command() string {
+func (m MessageSTAT) CommandName() string {
 	return "STAT"
+}
+func (m MessageStrm) CommandName() string {
+	return "STRM"
 }
 
 
@@ -146,8 +149,27 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
 	slimLog.Info("Starting to listen for events for %s", conn.RemoteAddr())
 	for {
+		// Wait for an action
 		action := <- actions
 		slimLog.Info("received action from FSM: %s", action)
+
+		// Must make a type assertion
+                switch t := action.msg.(type) {
+                case MessageStrm :
+	                eventLog.Info("Got a MessageStrm of type %s (%s)", string(t.Command), t)
+
+// TBD: This is just for testing...
+binary.Write(conn, binary.BigEndian, (uint16) (28))
+binary.Write(conn, binary.BigEndian, "strm")
+
+			err := binary.Write(conn, binary.BigEndian, &t)
+			if err != nil {
+				slimLog.Error("FAILED to write message to player: %s", err)
+				return
+			}
+		default:
+			eventLog.Warning("Got unknown action %s", t)
+		}
 	}
 
 }
@@ -155,11 +177,12 @@ func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
 func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 	slimLog.Info("Starting to listen for actions for %s", conn.RemoteAddr())
 
+	for {
 	var header MessageHeader
 
 	err := binary.Read(conn, binary.BigEndian, &header)
 	if err != nil {
-		slimLog.Info("%s", err)
+		slimLog.Info("FAILED to read header from player: %s", err)
 		return
 	}
 	cmd := string(header.Command[:4])
@@ -177,7 +200,7 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
  
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
-			slimLog.Info("%s", err)
+			slimLog.Info("FAILED to read HELO: %s", err)
 			return
 		}
 
@@ -197,10 +220,11 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
-			slimLog.Info("%s", err)
+			slimLog.Info("FAILED to read STAT: %s", err)
 			return
 		}
                 evt.msg = msg
 		events <- *evt
+	}
 	}
 }
