@@ -177,13 +177,14 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 
 		var msg MessageHELO
                 evt := new(SlimPlayerEvent)
-                evt.msg = msg
  
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
 			slimLog.Info("%s", err)
 			return
 		}
+
+                evt.msg = msg
 
 		// Send the event to the FSM	
 		events <- *evt
@@ -196,13 +197,13 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 		}
 		var msg MessageSTAT
                 evt := new(SlimPlayerEvent)
-                evt.msg = msg
 
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
 			slimLog.Info("%s", err)
 			return
 		}
+                evt.msg = msg
 		events <- *evt
 	}
 }

@@ -66,7 +66,7 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
                                 	case evt := <- p.EventChan:
 					switch t := evt.msg.(type) {
 					case MessageHELO :
-						eventLog.Info("Type is MessageHELO: %s", t.Mac)
+						eventLog.Info("Got a MessageHELO with DeviceID %d", t.DeviceID)
 					case MessageSTAT :
 						eventLog.Info("Type is MessageSTAT: %s", t)
 					default:
