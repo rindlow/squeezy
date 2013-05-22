@@ -13,6 +13,7 @@ type SlimCommand struct {
 	Player  [6]byte
 }
 
+// TBD: split this into a client-interface and a server-interface since they differ
 type Message interface {
 	CommandName() string
 }
@@ -158,7 +159,7 @@ func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
                 case MessageStrm :
 	                eventLog.Info("Got a MessageStrm of type %s (%s)", string(t.Command), t)
 
-// TBD: This is just for testing...
+// TBD: This is just for testing... Need to wrap these properly
 binary.Write(conn, binary.BigEndian, (uint16) (28))
 binary.Write(conn, binary.BigEndian, "strm")
 
