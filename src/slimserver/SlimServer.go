@@ -3,7 +3,6 @@ package slimserver
 import (
 	//"bytes"
 	"encoding/binary"
-	"fmt"
 	"net"
 	//"time"
 	"github.com/op/go-logging"
@@ -126,6 +125,8 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 			slimLog.Panic("%s", err)
 		}
 
+		slimLog.Info("Got incomming connection from %s", conn.RemoteAddr())
+
 		// A new player has connected, start by creating FSM-chans for it
                 reg := new(SlimReg)
                 reg.EventChan = make(chan SlimPlayerEvent)
@@ -135,29 +136,28 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 		// Send the reg object to the Eventhandler on the meta-chan
 		slimRegChan <- *reg
 
-		// Kick off a clientHandler for conn and the two chans
-		go clientHandler(conn, reg.EventChan, reg.ActionChan)
+		// Kick off a clientReader which reads from the player and creates FSM event
+		go clientEventReader(conn, reg.EventChan)
+
+		// Kick off a clientReader which reads FSM actions and writes to the player
+		go clientActionSender(conn, reg.ActionChan)
+
+		//TBD: Might need to tie together the clientEventReader/clientActionWriter somehow
 	}
 }
 
-func clientHandler(conn net.Conn, events chan SlimPlayerEvent, actions chan SlimPlayerAction) {
-	slimLog.Info("Got incomming connection from %s", conn.RemoteAddr())
+func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
+	slimLog.Info("Starting to listen for events for %s", conn.RemoteAddr())
 	for {
-
-// TBD: Read from client socket, translate to events which are pushed to FSM
-// TBD: Read from client events chan, translate to messages sent to player socket
-
-		select {
-		//case command := <- commands:
-		//	slimLog.Info("command")
-		//case message := < message
-		}
+		action := <- actions
+		slimLog.Info("received action from FSM: %s", action)
 	}
 
 }
 
-// TBD: Merge with above, only per-message parsing should be performed here, all state handling is done in EventHandler per-player FSM
-func messageChannel(conn net.Conn, m chan Message) {
+func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
+	slimLog.Info("Starting to listen for actions for %s", conn.RemoteAddr())
+
 	var header MessageHeader
 
 	err := binary.Read(conn, binary.BigEndian, &header)
@@ -166,7 +166,7 @@ func messageChannel(conn net.Conn, m chan Message) {
 		return
 	}
 	cmd := string(header.Command[:4])
-	fmt.Printf("command = %v, msgLen = %v\n", cmd, header.MsgLen)
+	slimLog.Info("command = %v, msgLen = %v\n", cmd, header.MsgLen)
 	switch cmd {
 	case "HELO":
 		if header.MsgLen != 36 {
@@ -174,13 +174,20 @@ func messageChannel(conn net.Conn, m chan Message) {
 				header.MsgLen)
 			return
 		}
+
 		var msg MessageHELO
+                evt := new(SlimPlayerEvent)
+                evt.msg = msg
+ 
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
 			slimLog.Info("%s", err)
 			return
 		}
-		m <- msg
+
+		// Send the event to the FSM	
+		events <- *evt
+		
 	case "STAT":
 		if header.MsgLen != 53 {
 			slimLog.Info("Expecting 53 bytes STAT, got %d\n",
@@ -188,11 +195,14 @@ func messageChannel(conn net.Conn, m chan Message) {
 			return
 		}
 		var msg MessageSTAT
+                evt := new(SlimPlayerEvent)
+                evt.msg = msg
+
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
 			slimLog.Info("%s", err)
 			return
 		}
-		m <- msg
+		events <- *evt
 	}
 }

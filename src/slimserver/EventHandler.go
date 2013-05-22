@@ -27,6 +27,7 @@ type SlimPlayerAction struct {
 
 // TBD: Fill with data fields
 type SlimPlayerEvent struct {
+	msg Message // The message which is to be passed to the FSM
 }
 
 // The meta-channel tieing the EventHandler to the SlimServer (e.g. informing EventHandler about new players)
@@ -41,17 +42,42 @@ type SlimReg struct {
 	ActionChan chan SlimPlayerAction	
 }
 
+type SlimPlayerFSM struct {
+	State string // for now...
+	Mac   string // for now...
+	EventChan chan SlimPlayerEvent	
+	ActionChan chan SlimPlayerAction	
+}
+
 // The core FSM engine
 func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 
         go func() {
+                players := make([]SlimPlayerFSM, 1)
+
+
                 for {
 			eventLog.Debug("FSM loop")
 			time.Sleep(time.Second)
 
-			// Check for events (using select) from any of the player chans,
-			// run FSM for these events. Emit actions if necessary.
-			// TBD!!
+			// Iterate all known players, checking for incoming events
+			for _, p := range players {
+                        	select {
+                                	case evt := <- p.EventChan:
+					switch t := evt.msg.(type) {
+					case MessageHELO :
+						eventLog.Info("Type is MessageHELO: %s", t.Mac)
+					case MessageSTAT :
+						eventLog.Info("Type is MessageSTAT: %s", t)
+					default:
+						eventLog.Info("Type is default")
+					}
+
+// TBD: Pass the message to the associated FSM and return actions
+
+                                	default:
+                        	}
+			}
 
 			// Check for events from the stream server
 			select {
@@ -65,8 +91,13 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 			// Check if there is a new player registered on the meta-chan, if so set it up
 			select {
 				case reg := <- slimReg:
-				eventLog.Info("BINGO: %s", reg)
-				// TBD: Create a FSM for this Mac, associate with the two chans
+				eventLog.Info("Received notification of new player, setting up chans and FSM")
+
+				// Register the new player in the slice
+				var p SlimPlayerFSM
+				p.EventChan=reg.EventChan
+				p.ActionChan=reg.ActionChan
+				players = append(players, p)
 
   				default:
   			}
