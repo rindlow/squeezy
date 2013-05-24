@@ -81,7 +81,7 @@ a.msg=msg
 p.ActionChan <- *a
 
 					case MessageSTAT :
-						eventLog.Info("Got a MessageSTAT: %s (%s)", string(t.Event[:4]), t.ErrorCode)
+						eventLog.Info("Got a MessageSTAT: %s (%d)", string(t.Event[:4]), t.ErrorCode)
 					default:
 						eventLog.Info("Type is default")
 					}
