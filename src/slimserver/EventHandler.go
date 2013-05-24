@@ -68,7 +68,7 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 // Just for the fun of it... Tell the player to start streaming
 var msg MessageStrm
 msg.Command='s'
-msg.Autostart='2'
+msg.Autostart='1'
 msg.PCMSampleSize='?'
 msg.PCMSampleRate='?'
 msg.PCMChannels='?'
