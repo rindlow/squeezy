@@ -25,7 +25,7 @@ func main() {
 	// Parse command line flags
 	flag.BoolVar(&startSlim, "slim", true, "Start the slimserver")
 	flag.BoolVar(&updateLibrary, "update", false, "Initiate a library update")
-	flag.IntVar(&finalSleep, "sleep", 60, "Number of seconds to sleep before exit")
+	flag.IntVar(&finalSleep, "sleep", 600, "Number of seconds to sleep before exit")
 	flag.StringVar(&libraryBase, "base", "/data/music", "Basedir for mp3 files")
 	flag.Parse()
 
