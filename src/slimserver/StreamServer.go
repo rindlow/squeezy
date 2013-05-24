@@ -29,9 +29,8 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 
 	streamLog.Info("Player %s connected to streamer", playerId);
 
-	// Check if there if a stream is configured for this player, if so start streaming
-
-	fmt.Fprintf(w, "Here we should stream you some mp3 data...")
+	// TBD: Check what to stream for this player (we should have received the info on the chan already)
+	//	rather than always playing test.mp3 to everyone...
 
  	fd, _ := os.Open("/data/test.mp3")
 	defer fd.Close()
