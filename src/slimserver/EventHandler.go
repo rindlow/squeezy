@@ -65,7 +65,7 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 
 
 // TBD: This is just bogus testing!
-// Just for the fun of it... Tell the player to start streaming
+// Just for the fun of it... Tell the player to start streaming whenever it connects
 var msg MessageStrm
 msg.Command='s'
 msg.Autostart='1'
