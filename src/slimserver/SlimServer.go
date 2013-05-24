@@ -3,6 +3,7 @@ package slimserver
 import (
 	"encoding/binary"
 	"net"
+	"fmt"
 	"github.com/op/go-logging"
 )
 
@@ -131,8 +132,8 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 
 		// A new player has connected, start by creating FSM-chans for it
                 reg := new(SlimReg)
-                reg.EventChan = make(chan SlimPlayerEvent)
-                reg.ActionChan = make(chan SlimPlayerAction)
+                reg.EventChan = make(chan SlimPlayerEvent, 100)
+                reg.ActionChan = make(chan SlimPlayerAction, 100)
 
 		// Send the reg object to the Eventhandler on the meta-chan
 		slimRegChan <- *reg
@@ -157,11 +158,12 @@ func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
 		// Must make a type assertion
                 switch t := action.msg.(type) {
                 case MessageStrm :
-	                eventLog.Info("Got a MessageStrm of type %s (%s)", string(t.Command), t)
+	                eventLog.Info("Got a MessageStrm of type %s", string(t.Command))
 
 // TBD: This is just for testing... Need to wrap these properly
-binary.Write(conn, binary.BigEndian, (uint16) (28))
-binary.Write(conn, binary.BigEndian, "strm")
+binary.Write(conn, binary.BigEndian, int8(0))
+binary.Write(conn, binary.BigEndian, int8(28))
+fmt.Fprintf(conn, "strm")
 
 			err := binary.Write(conn, binary.BigEndian, &t)
 			if err != nil {
@@ -187,7 +189,6 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 		return
 	}
 	cmd := string(header.Command[:4])
-	slimLog.Info("command = %v, msgLen = %v\n", cmd, header.MsgLen)
 	switch cmd {
 	case "HELO":
 		if header.MsgLen != 36 {
@@ -208,6 +209,7 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
                 evt.msg = msg
 
 		// Send the event to the FSM	
+slimLog.Debug("Sending HELO to event processor")
 		events <- *evt
 		
 	case "STAT":
@@ -225,6 +227,7 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 			return
 		}
                 evt.msg = msg
+slimLog.Debug("Sending STAT to event processor")
 		events <- *evt
 	}
 	}

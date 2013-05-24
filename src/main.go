@@ -41,11 +41,11 @@ func main() {
 
 		// The StreamServer use two static chans, wrap them up
 		streamChans := new(slimserver.StreamServerFSMChans)
-		streamChans.StreamEvent = make(chan slimserver.StreamEvent)
-		streamChans.StreamAction = make(chan slimserver.StreamAction)
+		streamChans.StreamEvent = make(chan slimserver.StreamEvent, 100)
+		streamChans.StreamAction = make(chan slimserver.StreamAction, 100)
 
 		// The SlimServer allocates per-player chans, create meta-chan
-		slimChans := make(chan slimserver.SlimReg)
+		slimChans := make(chan slimserver.SlimReg, 100)
 
 		// Start Disco
 		log.Info("Starting Discovery server...")

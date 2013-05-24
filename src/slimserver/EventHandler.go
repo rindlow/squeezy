@@ -52,7 +52,7 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 
 
                 for {
-			eventLog.Debug("FSM loop")
+			eventLog.Info("FSM loop")
 			time.Sleep(time.Second)
 
 			// Iterate all known players, checking for incoming events
@@ -68,6 +68,8 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 // Just for the fun of it... Tell the player to start streaming
 var msg MessageStrm
 msg.Command='s'
+msg.Autostart='0'
+msg.TransType='0'
 msg.Format='m'
 msg.ServerPort=9000
 a := new(SlimPlayerAction)
@@ -75,7 +77,7 @@ a.msg=msg
 p.ActionChan <- *a
 
 					case MessageSTAT :
-						eventLog.Info("Type is MessageSTAT: %s", t)
+						eventLog.Info("Got a MessageSTAT")
 					default:
 						eventLog.Info("Type is default")
 					}
