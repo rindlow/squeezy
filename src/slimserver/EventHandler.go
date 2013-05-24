@@ -68,7 +68,11 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
 // Just for the fun of it... Tell the player to start streaming
 var msg MessageStrm
 msg.Command='s'
-msg.Autostart='0'
+msg.Autostart='2'
+msg.PCMSampleSize='?'
+msg.PCMSampleRate='?'
+msg.PCMChannels='?'
+msg.PCMEndian='?'
 msg.TransType='0'
 msg.Format='m'
 msg.ServerPort=9000
@@ -77,7 +81,7 @@ a.msg=msg
 p.ActionChan <- *a
 
 					case MessageSTAT :
-						eventLog.Info("Got a MessageSTAT")
+						eventLog.Info("Got a MessageSTAT: %s (%s)", string(t.Event[:4]), t.ErrorCode)
 					default:
 						eventLog.Info("Type is default")
 					}

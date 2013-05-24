@@ -162,7 +162,7 @@ func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
 
 // TBD: This is just for testing... Need to wrap these properly
 binary.Write(conn, binary.BigEndian, int8(0))
-binary.Write(conn, binary.BigEndian, int8(28))
+binary.Write(conn, binary.BigEndian, int8(28+37))
 fmt.Fprintf(conn, "strm")
 
 			err := binary.Write(conn, binary.BigEndian, &t)
@@ -170,6 +170,9 @@ fmt.Fprintf(conn, "strm")
 				slimLog.Error("FAILED to write message to player: %s", err)
 				return
 			}
+
+fmt.Fprintf(conn, "GET /stream.mp3?player=1 HTTP/1.0\015\012\015\012")
+
 		default:
 			eventLog.Warning("Got unknown action %s", t)
 		}

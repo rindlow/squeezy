@@ -3,6 +3,8 @@ package slimserver
 import (
         "net/http"
 	"fmt"
+	"os"
+	"io"
         "github.com/op/go-logging"
 )
 
@@ -25,11 +27,16 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 
 	playerId:=r.FormValue("player")
 
-	streamLog.Info("Player %s connected", playerId);
+	streamLog.Info("Player %s connected to streamer", playerId);
 
 	// Check if there if a stream is configured for this player, if so start streaming
 
 	fmt.Fprintf(w, "Here we should stream you some mp3 data...")
+
+ 	fd, _ := os.Open("/data/test.mp3")
+	defer fd.Close()
+	io.Copy(w, fd)
+
 }
 
 func StreamServer(chans StreamServerFSMChans) {
