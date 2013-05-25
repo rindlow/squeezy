@@ -21,15 +21,27 @@ func streamHandler(w http.ResponseWriter, r *http.Request) {
 
 	trackId:=r.FormValue("track")
 
+	if(trackId == "") {
+		streamLog.Warning("trackId nil")
+		return
+	}
+
 	streamLog.Info("Incoming stream request for track %s", trackId);
 
-	// TBD: Verify that trackId is numeic
-	id, _ := strconv.Atoi(trackId)
+	id, err := strconv.Atoi(trackId)
+	if(err != nil) {
+		streamLog.Warning("trackID parse error: %s", err)
+		return
+	}
+
+	// TBD: The GetTrackById should return a (track, error)
 	fname:=musiclibrary.GetTrackById(id).FName
+	if(fname == "") {
+		streamLog.Warning("trackID not found")
+		return
+	}
 
 	streamLog.Info("Starting to stream %s", fname)
-
-	// TBD: Error handling and such...
 
  	fd, _ := os.Open(fname)
 	defer fd.Close()
