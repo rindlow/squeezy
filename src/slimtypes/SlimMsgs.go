@@ -1,10 +1,5 @@
 package slimtypes
 
-type SlimCommand struct {
-	Command byte
-	Player  [6]byte
-}
-
 // TBD: split this into a client-interface and a server-interface since they differ
 type Message interface {
 	CommandName() string
