@@ -2,11 +2,17 @@ package musiclibrary
 
 import (
   "musiclibrary/database"
+  "musiclibrary/mp3info"
   "fmt"
 )
 
 type MusicLibrary struct {
  //Files []Mp3File
+}
+
+func GetTrackById(id int) mp3info.Mp3Info {
+	track:=database.GetTrackById(id)
+	return track
 }
 
 func PrintLibrary() {

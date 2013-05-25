@@ -161,8 +161,9 @@ func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
 	                eventLog.Info("Got a MessageStrm of type %s", string(t.Command))
 
 // TBD: This is just for testing... Need to wrap these properly
+streamUrl :=  "GET /stream.mp3?track=1 HTTP/1.0\015\012\015\012"
 binary.Write(conn, binary.BigEndian, int8(0))
-binary.Write(conn, binary.BigEndian, int8(28+37))
+binary.Write(conn, binary.BigEndian, int8(28+len(streamUrl)))
 fmt.Fprintf(conn, "strm")
 
 			err := binary.Write(conn, binary.BigEndian, &t)
@@ -171,7 +172,7 @@ fmt.Fprintf(conn, "strm")
 				return
 			}
 
-fmt.Fprintf(conn, "GET /stream.mp3?player=1 HTTP/1.0\015\012\015\012")
+			fmt.Fprintf(conn, streamUrl)
 
 		default:
 			eventLog.Warning("Got unknown action %s", t)

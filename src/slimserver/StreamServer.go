@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"io"
+	"strconv"
         "github.com/op/go-logging"
+	"musiclibrary"
 )
 
 var streamLog = logging.MustGetLogger("streamer")
@@ -25,14 +27,19 @@ func webHandler(w http.ResponseWriter, r *http.Request) {
 
 func streamHandler(w http.ResponseWriter, r *http.Request) {
 
-	playerId:=r.FormValue("player")
+	trackId:=r.FormValue("track")
 
-	streamLog.Info("Player %s connected to streamer", playerId);
+	streamLog.Info("Incoming stream request for track %s", trackId);
 
-	// TBD: Check what to stream for this player (we should have received the info on the chan already)
-	//	rather than always playing test.mp3 to everyone...
+	// TBD: Verify that trackId is numeic
+	id, _ := strconv.Atoi(trackId)
+	fname:=musiclibrary.GetTrackById(id).FName
 
- 	fd, _ := os.Open("/data/test.mp3")
+	streamLog.Info("Starting to stream %s", fname)
+
+	// TBD: Error handling and such...
+
+ 	fd, _ := os.Open(fname)
 	defer fd.Close()
 	io.Copy(w, fd)
 

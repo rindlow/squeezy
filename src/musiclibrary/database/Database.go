@@ -77,6 +77,28 @@ tx.Commit()
 }
 
 
+func GetTrackById(id int) mp3info.Mp3Info {
+  var track mp3info.Mp3Info
+
+  // Get connection to database
+  conn, err:=getConn()
+  if err != nil {
+      fmt.Println(err)
+      return track  // TBD: Error handling
+  }
+
+  // TBD: SQL injection 'R' Us
+  row := conn.QueryRow("select fname, name, album, artist from track where id=?", id)
+  err = row.Scan(&track.FName, &track.Name, &track.Album, &track.Artist)
+  if err != nil {
+    fmt.Println(err)
+    return track // TBD: Error handling
+  }
+
+  return track
+
+
+}
 
 func GetAllTracks() []mp3info.Mp3Info {
 
