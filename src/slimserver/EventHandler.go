@@ -8,11 +8,11 @@ import (
 
 var eventLog = logging.MustGetLogger("event")
 
-// TBD: Fill with data fields
+// TBD: No need for this one anymore - have it removed
 type StreamAction struct {
 }
 
-// TBD: Fill with data fields
+// TBD: No need for this one anymore - have it removed
 type StreamEvent struct {
 }
 
@@ -22,10 +22,12 @@ type StreamServerFSMChans struct {
 	StreamAction	chan StreamAction
 }
 
+// TBD: No need for this one - use te raw client Message interface for chan
 type SlimPlayerAction struct {
 	msg slimtypes.Message // The message which is to be passed to the FSM
 }
 
+// TBD: No need for this one - use te raw server Message interface for chan
 type SlimPlayerEvent struct {
 	msg slimtypes.Message // The message which is to be passed to the FSM
 }
