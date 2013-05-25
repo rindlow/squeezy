@@ -2,6 +2,7 @@ package slimserver
 
 import (
 	"time"
+	"slimtypes"
         "github.com/op/go-logging"
 )
 
@@ -22,11 +23,11 @@ type StreamServerFSMChans struct {
 }
 
 type SlimPlayerAction struct {
-	msg Message // The message which is to be passed to the FSM
+	msg slimtypes.Message // The message which is to be passed to the FSM
 }
 
 type SlimPlayerEvent struct {
-	msg Message // The message which is to be passed to the FSM
+	msg slimtypes.Message // The message which is to be passed to the FSM
 }
 
 // The meta-channel tieing the EventHandler to the SlimServer (e.g. informing EventHandler about new players)
@@ -60,13 +61,13 @@ func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
                         	select {
                                 	case evt := <- p.EventChan:
 					switch t := evt.msg.(type) {
-					case MessageHELO :
+					case slimtypes.MessageHELO :
 						eventLog.Info("Got a MessageHELO with DeviceID %d", t.DeviceID)
 
 
 // TBD: This is just bogus testing!
 // Just for the fun of it... Tell the player to start streaming whenever it connects
-var msg MessageStrm
+var msg slimtypes.MessageStrm
 msg.Command='s'
 msg.Autostart='1'
 msg.PCMSampleSize='?'
@@ -80,7 +81,7 @@ a := new(SlimPlayerAction)
 a.msg=msg
 p.ActionChan <- *a
 
-					case MessageSTAT :
+					case slimtypes.MessageSTAT :
 						eventLog.Info("Got a MessageSTAT: %s (%d)", string(t.Event[:4]), t.ErrorCode)
 					default:
 						eventLog.Info("Type is default")
