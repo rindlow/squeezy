@@ -7,29 +7,19 @@ import (
 
 var eventLog = logging.MustGetLogger("event")
 
-// TBD: No need for this one - use te raw client Message interface for chan
-type SlimPlayerAction struct {
-	msg Message // The message which is to be passed to the FSM
-}
-
-// TBD: No need for this one - use te raw server Message interface for chan
-type SlimPlayerEvent struct {
-	msg Message // The message which is to be passed to the FSM
-}
-
 // The meta-channel tieing the EventHandler to the SlimServer (e.g. informing EventHandler about new players)
 type SlimReg struct {
 	// Chan for communicating an event from a player to the FSM
-	EventChan chan SlimPlayerEvent	
+	EventChan chan ClientMessage
 
 	// Chan for communicating an action from the FSM to the player
-	ActionChan chan SlimPlayerAction	
+	ActionChan chan ServerMessage	
 }
 
 type SlimPlayerFSM struct {
 	State string // for now...
-	EventChan chan SlimPlayerEvent	
-	ActionChan chan SlimPlayerAction	
+	EventChan chan ClientMessage	
+	ActionChan chan ServerMessage	
 }
 
 // The core FSM engine
@@ -47,7 +37,7 @@ func EventHandler(slimReg chan SlimReg) {
 			for _, p := range players {
                         	select {
                                 	case evt := <- p.EventChan:
-					switch t := evt.msg.(type) {
+					switch t := evt.(type) {
 					case MessageHELO :
 						eventLog.Info("Got a MessageHELO with DeviceID %d", t.DeviceID)
 
@@ -64,9 +54,7 @@ msg.PCMEndian='?'
 msg.TransType='0'
 msg.Format='m'
 msg.ServerPort=9000
-a := new(SlimPlayerAction)
-a.msg=msg
-p.ActionChan <- *a
+p.ActionChan <- msg
 
 					case MessageSTAT :
 						eventLog.Info("Got a MessageSTAT: %s (%d)", string(t.Event[:4]), t.ErrorCode)

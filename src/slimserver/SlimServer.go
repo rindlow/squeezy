@@ -32,8 +32,8 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 
 		// A new player has connected, start by creating FSM-chans for it
                 reg := new(SlimReg)
-                reg.EventChan = make(chan SlimPlayerEvent, 100)
-                reg.ActionChan = make(chan SlimPlayerAction, 100)
+                reg.EventChan = make(chan ClientMessage, 100)
+                reg.ActionChan = make(chan ServerMessage, 100)
 
 		// Send the reg object to the Eventhandler on the meta-chan
 		slimRegChan <- *reg
@@ -48,14 +48,14 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 	}
 }
 
-func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
+func clientActionSender(conn net.Conn, actions <-chan ServerMessage) {
 	slimLog.Info("Starting to listen for events for %s", conn.RemoteAddr())
 	for {
 		// Wait for an action
 		action := <- actions
 
 		// Must make a type assertion
-                switch t := action.msg.(type) {
+                switch t := action.(type) {
                 case MessageStrm :
 	                eventLog.Info("Got a MessageStrm of type %s", string(t.Command))
 
@@ -80,7 +80,7 @@ fmt.Fprintf(conn, "strm")
 
 }
 
-func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
+func clientEventReader(conn net.Conn, events chan<- ClientMessage) {
 	slimLog.Info("Starting to listen for actions for %s", conn.RemoteAddr())
 
 	for {
@@ -101,7 +101,6 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 		}
 
 		var msg MessageHELO
-                evt := new(SlimPlayerEvent)
  
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
@@ -109,11 +108,10 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 			return
 		}
 
-                evt.msg = msg
 
 		// Send the event to the FSM	
 slimLog.Debug("Sending HELO to event processor")
-		events <- *evt
+		events <- msg
 		
 	case "STAT":
 		if header.MsgLen != 53 {
@@ -122,16 +120,14 @@ slimLog.Debug("Sending HELO to event processor")
 			return
 		}
 		var msg MessageSTAT
-                evt := new(SlimPlayerEvent)
 
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
 			slimLog.Info("FAILED to read STAT: %s", err)
 			return
 		}
-                evt.msg = msg
 slimLog.Debug("Sending STAT to event processor")
-		events <- *evt
+		events <- msg
 	}
 	}
 }

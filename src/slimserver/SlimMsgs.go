@@ -1,8 +1,11 @@
 package slimserver
 
-// TBD: split this into a client-interface and a server-interface since they differ
-type Message interface {
-	CommandName() string
+type ServerMessage interface {
+	ServerCommandName() string
+}
+
+type ClientMessage interface {
+	ClientCommandName() string
 }
 
 type MessageHeader struct {
@@ -84,13 +87,13 @@ type MessageStrm struct {
 	ServerIP        [4]byte
 }
 
-func (m MessageHELO) CommandName() string {
+func (m MessageHELO) ClientCommandName() string {
 	return "HELO"
 }
-func (m MessageSTAT) CommandName() string {
+func (m MessageSTAT) ClientCommandName() string {
 	return "STAT"
 }
-func (m MessageStrm) CommandName() string {
-	return "STRM"
+func (m MessageStrm) ServerCommandName() string {
+	return "strm"
 }
 
