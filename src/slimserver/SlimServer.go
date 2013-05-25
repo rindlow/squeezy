@@ -54,7 +54,6 @@ func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
 	for {
 		// Wait for an action
 		action := <- actions
-		slimLog.Info("received action from FSM: %s", action)
 
 		// Must make a type assertion
                 switch t := action.msg.(type) {

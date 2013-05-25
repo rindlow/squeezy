@@ -8,20 +8,6 @@ import (
 
 var eventLog = logging.MustGetLogger("event")
 
-// TBD: No need for this one anymore - have it removed
-type StreamAction struct {
-}
-
-// TBD: No need for this one anymore - have it removed
-type StreamEvent struct {
-}
-
-// The pair of channels which tie the EventHandler to the StreamServer
-type StreamServerFSMChans struct {
-	StreamEvent	chan StreamEvent
-	StreamAction	chan StreamAction
-}
-
 // TBD: No need for this one - use te raw client Message interface for chan
 type SlimPlayerAction struct {
 	msg slimtypes.Message // The message which is to be passed to the FSM
@@ -48,7 +34,7 @@ type SlimPlayerFSM struct {
 }
 
 // The core FSM engine
-func EventHandler(streamChans StreamServerFSMChans, slimReg chan SlimReg) {
+func EventHandler(slimReg chan SlimReg) {
 
         go func() {
                 players := make([]SlimPlayerFSM, 1)
@@ -94,15 +80,6 @@ p.ActionChan <- *a
                                 	default:
                         	}
 			}
-
-			// Check for events from the stream server
-			select {
-				case evt := <- streamChans.StreamEvent:
-				eventLog.Info("STREAM-EVT:: %s", evt)
-				// TBD: Pass this event to the appropriate client FSM
-
-  				default:
-  			}
 
 			// Check if there is a new player registered on the meta-chan, if so set it up
 			select {

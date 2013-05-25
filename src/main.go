@@ -39,11 +39,6 @@ func main() {
 
 		log.Info("Setting upp FSM chans...");
 
-		// The StreamServer use two static chans, wrap them up
-		streamChans := new(slimserver.StreamServerFSMChans)
-		streamChans.StreamEvent = make(chan slimserver.StreamEvent, 100)
-		streamChans.StreamAction = make(chan slimserver.StreamAction, 100)
-
 		// The SlimServer allocates per-player chans, create meta-chan
 		slimChans := make(chan slimserver.SlimReg, 100)
 
@@ -53,7 +48,7 @@ func main() {
 
 		// Start Streamer
 		log.Info("Starting Streaming server...")
-		go slimserver.StreamServer(*streamChans)
+		go slimserver.StreamServer()
 
 		// Start SlimProto
 		log.Info("Starting SlimProto server...")
@@ -62,7 +57,7 @@ func main() {
 
 		// Start EventHandler
 		log.Info("Starting EventHandler...")
-		go slimserver.EventHandler(*streamChans, slimChans)
+		go slimserver.EventHandler(slimChans)
 	}
 
 	// Should library be updated
