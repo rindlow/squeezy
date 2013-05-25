@@ -1,4 +1,4 @@
-package slimtypes
+package slimserver
 
 // TBD: split this into a client-interface and a server-interface since they differ
 type Message interface {

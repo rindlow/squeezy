@@ -5,7 +5,6 @@ import (
 	"net"
 	"fmt"
 	"github.com/op/go-logging"
-	"slimtypes"
 )
 
 type SlimServer struct {
@@ -57,7 +56,7 @@ func clientActionSender(conn net.Conn, actions <-chan SlimPlayerAction) {
 
 		// Must make a type assertion
                 switch t := action.msg.(type) {
-                case slimtypes.MessageStrm :
+                case MessageStrm :
 	                eventLog.Info("Got a MessageStrm of type %s", string(t.Command))
 
 // TBD: This is just for testing... Need to wrap these properly
@@ -85,7 +84,7 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 	slimLog.Info("Starting to listen for actions for %s", conn.RemoteAddr())
 
 	for {
-	var header slimtypes.MessageHeader
+	var header MessageHeader
 
 	err := binary.Read(conn, binary.BigEndian, &header)
 	if err != nil {
@@ -101,7 +100,7 @@ func clientEventReader(conn net.Conn, events chan<- SlimPlayerEvent) {
 			return
 		}
 
-		var msg slimtypes.MessageHELO
+		var msg MessageHELO
                 evt := new(SlimPlayerEvent)
  
 		err = binary.Read(conn, binary.BigEndian, &msg)
@@ -122,7 +121,7 @@ slimLog.Debug("Sending HELO to event processor")
 				header.MsgLen)
 			return
 		}
-		var msg slimtypes.MessageSTAT
+		var msg MessageSTAT
                 evt := new(SlimPlayerEvent)
 
 		err = binary.Read(conn, binary.BigEndian, &msg)
