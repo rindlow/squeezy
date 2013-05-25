@@ -65,6 +65,8 @@ binary.Write(conn, binary.BigEndian, int8(0))
 binary.Write(conn, binary.BigEndian, int8(28+len(streamUrl)))
 fmt.Fprintf(conn, "strm")
 
+// Make the above way more generic, utilize ServerCommandName() method
+
 			err := binary.Write(conn, binary.BigEndian, &t)
 			if err != nil {
 				slimLog.Error("FAILED to write message to player: %s", err)
