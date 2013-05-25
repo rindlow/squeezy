@@ -43,6 +43,7 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 
 		// Kick off a clientReader which reads FSM actions and writes to the player
 		go clientActionSender(conn, reg.ActionChan)
+	}
 
 }
 
