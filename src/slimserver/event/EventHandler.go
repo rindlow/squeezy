@@ -1,16 +1,20 @@
 package event
 
+// Manage player states, will most probably need two FSMs per player:
+// * SlimProto state (e.g. play/pause/etc)
+// * Menu state (e.g. IR messages)
+
 import (
 	"time"
         "github.com/op/go-logging"
 	"slimserver/slimproto"
-//	"cgl.tideland.biz/state"
+	"cgl.tideland.biz/state"
 )
 
 var eventLog = logging.MustGetLogger("event")
 
 type SlimPlayerFSM struct {
-	State string // for now...
+	Fsm *state.FSM // The SlimProto FSM
 	EventChan chan slimproto.ClientMessage	
 	ActionChan chan slimproto.ServerMessage	
 }
@@ -30,33 +34,7 @@ func EventHandler(slimReg chan slimproto.SlimReg) {
 			for _, p := range players {
                         	select {
                                 	case evt := <- p.EventChan:
-					switch t := evt.(type) {
-					case slimproto.MessageHELO :
-						eventLog.Info("Got a MessageHELO with DeviceID %d", t.DeviceID)
-
-
-// TBD: This is just bogus testing!
-// Just for the fun of it... Tell the player to start streaming whenever it connects
-var msg slimproto.MessageStrm
-msg.Command='s'
-msg.Autostart='1'
-msg.PCMSampleSize='?'
-msg.PCMSampleRate='?'
-msg.PCMChannels='?'
-msg.PCMEndian='?'
-msg.TransType='0'
-msg.Format='m'
-msg.ServerPort=9000
-p.ActionChan <- msg
-
-					case slimproto.MessageSTAT :
-						eventLog.Info("Got a MessageSTAT: %s (%d)", string(t.Event[:4]), t.ErrorCode)
-					default:
-						eventLog.Info("Type is default")
-					}
-
-// TBD: Pass the message to the associated FSM and return actions
-
+						p.Fsm.Handle("ClientMessage", evt)
                                 	default:
                         	}
 			}
@@ -68,20 +46,17 @@ p.ActionChan <- msg
 
 				// Register the new player in the slice
 				var p SlimPlayerFSM
+				p.Fsm = state.New(NewSlimHandler(reg), 60*time.Second)
 				p.EventChan=reg.EventChan
 				p.ActionChan=reg.ActionChan
 				players = append(players, p)
 
+				p.Fsm.Handle("connect", nil)
   				default:
   			}
 
 
 		}
 	}()
-
-
 }
-
-
-// TBD: Implement the FSM helpers here
 
