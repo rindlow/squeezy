@@ -1,6 +1,6 @@
-package slimserver
+package slimproto
 
-func deviceName(id byte) string {
+func DeviceName(id byte) string {
 	switch id {
 	case 1: return "SLIMP3"
 	case 2: return "SqueezeBox"

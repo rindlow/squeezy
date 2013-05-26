@@ -1,4 +1,4 @@
-package slimserver
+package event
 
 import (
 	"time"
@@ -9,15 +9,6 @@ import (
 
 var eventLog = logging.MustGetLogger("event")
 
-// The meta-channel tieing the EventHandler to the SlimServer (e.g. informing EventHandler about new players)
-type SlimReg struct {
-	// Chan for communicating an event from a player to the FSM
-	EventChan chan slimproto.ClientMessage
-
-	// Chan for communicating an action from the FSM to the player
-	ActionChan chan slimproto.ServerMessage	
-}
-
 type SlimPlayerFSM struct {
 	State string // for now...
 	EventChan chan slimproto.ClientMessage	
@@ -25,7 +16,7 @@ type SlimPlayerFSM struct {
 }
 
 // The core FSM engine
-func EventHandler(slimReg chan SlimReg) {
+func EventHandler(slimReg chan slimproto.SlimReg) {
 
         go func() {
                 players := make([]SlimPlayerFSM, 1)

@@ -1,9 +1,10 @@
-package slimserver
+package servers
 
 import (
 	"bytes"
 	"encoding/binary"
 	"net"
+	"slimserver/slimproto"
 	//"fmt"
 	//"time"
         "github.com/op/go-logging"
@@ -52,7 +53,7 @@ func DiscoveryServer() {
 				}
 				mac = payload[12:18]
 				discoLog.Info("Discovery (d) from %v %v at %v\n",
-					deviceName(payload[2]), mac, raddr)
+					slimproto.DeviceName(payload[2]), mac, raddr)
 				uraddr, err := net.ResolveUDPAddr("udp4",
 					raddr.String())
 				if err != nil {

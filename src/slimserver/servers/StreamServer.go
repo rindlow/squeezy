@@ -1,4 +1,4 @@
-package slimserver
+package servers
 
 import (
         "net/http"

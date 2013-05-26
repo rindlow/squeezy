@@ -34,30 +34,8 @@ func main() {
 
 	// Should we start the server processes
 	if(startSlim) {
+		go slimserver.SlimServer()
 
-		// All the mess with creating channels should be encapsulated somewhere
-
-		log.Info("Setting upp FSM chans...");
-
-		// The SlimServer allocates per-player chans, create meta-chan
-		slimChans := make(chan slimserver.SlimReg, 100)
-
-		// Start Disco
-		log.Info("Starting Discovery server...")
-		go slimserver.DiscoveryServer()
-
-		// Start Streamer
-		log.Info("Starting Streaming server...")
-		go slimserver.StreamServer()
-
-		// Start SlimProto
-		log.Info("Starting SlimProto server...")
-		slimsrv := new(slimserver.SlimServer)
-		go slimsrv.Serve(slimChans)
-
-		// Start EventHandler
-		log.Info("Starting EventHandler...")
-		go slimserver.EventHandler(slimChans)
 	}
 
 	// Should library be updated
