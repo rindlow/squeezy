@@ -9,7 +9,7 @@ import (
 // Setup logger
 var fsmLog = logging.MustGetLogger("fsm")
 
-// TBD: Add state data here, such as the menu FSM
+// TBD: Add state data here, such as the menu FSM, current playlist etc
 type SlimHandler struct {
   action chan slimproto.ServerMessage
 }
