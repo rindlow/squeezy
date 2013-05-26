@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"net"
 	"fmt"
+	"slimserver/slimproto"
 	"github.com/op/go-logging"
 )
 
@@ -32,8 +33,8 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 
 		// A new player has connected, start by creating FSM-chans for it
                 reg := new(SlimReg)
-                reg.EventChan = make(chan ClientMessage, 100)
-                reg.ActionChan = make(chan ServerMessage, 100)
+                reg.EventChan = make(chan slimproto.ClientMessage, 100)
+                reg.ActionChan = make(chan slimproto.ServerMessage, 100)
 
 		// Send the reg object to the Eventhandler on the meta-chan
 		slimRegChan <- *reg
@@ -47,7 +48,7 @@ func (*SlimServer) Serve(slimRegChan chan SlimReg) {
 
 }
 
-func clientActionSender(conn net.Conn, actions <-chan ServerMessage) {
+func clientActionSender(conn net.Conn, actions <-chan slimproto.ServerMessage) {
 	slimLog.Info("Starting to listen for events for %s", conn.RemoteAddr())
 	for {
 		// Wait for an action
@@ -55,7 +56,7 @@ func clientActionSender(conn net.Conn, actions <-chan ServerMessage) {
 
 		// Must make a type assertion
                 switch t := action.(type) {
-                case MessageStrm :
+                case slimproto.MessageStrm :
 	                eventLog.Info("Got a MessageStrm of type %s", string(t.Command))
 
 // TBD: This is just for testing... Need to wrap these properly
@@ -81,11 +82,11 @@ fmt.Fprintf(conn, "strm")
 
 }
 
-func clientEventReader(conn net.Conn, events chan<- ClientMessage) {
+func clientEventReader(conn net.Conn, events chan<- slimproto.ClientMessage) {
 	slimLog.Info("Starting to listen for actions for %s", conn.RemoteAddr())
 
 	for {
-	var header MessageHeader
+	var header slimproto.MessageHeader
 
 	err := binary.Read(conn, binary.BigEndian, &header)
 	if err != nil {
@@ -101,7 +102,7 @@ func clientEventReader(conn net.Conn, events chan<- ClientMessage) {
 			return
 		}
 
-		var msg MessageHELO
+		var msg slimproto.MessageHELO
  
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {
@@ -120,7 +121,7 @@ slimLog.Debug("Sending HELO to event processor")
 				header.MsgLen)
 			return
 		}
-		var msg MessageSTAT
+		var msg slimproto.MessageSTAT
 
 		err = binary.Read(conn, binary.BigEndian, &msg)
 		if err != nil {

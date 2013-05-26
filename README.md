@@ -19,6 +19,9 @@ Fetch the source (ignore the warnings for go-id3):
 
   go get github.com/op/go-logging
 
+  go get cgl.tideland.biz/state
+
+
 TODO
 ====
 

@@ -1,4 +1,4 @@
-package slimserver
+package slimproto
 
 type ServerMessage interface {
 	ServerCommandName() string
